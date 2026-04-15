@@ -4,7 +4,8 @@
   "description": "",
   "main": "southernhobby.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node southernhobby.js",
+    "postinstall": "npx playwright install --with-deps chromium"
   },
   "keywords": [],
   "author": "",
