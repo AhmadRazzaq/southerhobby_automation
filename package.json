@@ -4,9 +4,8 @@
   "description": "",
   "main": "southernhobby.js",
   "scripts": {
-    "start": "node southernhobby.js",
-    "postinstall": "npx playwright install --with-deps chromium"
-  },
+  "start": "node southernhobby.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
