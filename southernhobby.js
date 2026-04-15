@@ -12,11 +12,11 @@ app.get("/run-southern", async (req, res) => {
     let browser;
 
     try {
-        // browser = await chromium.launch({ headless: true });
-        browser = await chromium.launch({
-            headless: false,
-            slowMo: 200   // optional: slows actions so you can see them
-        });
+        browser = await chromium.launch({ headless: true });
+        // browser = await chromium.launch({
+        //     headless: false,
+        //     slowMo: 200   // optional: slows actions so you can see them
+        // });
         const context = await browser.newContext();
         const page = await context.newPage();
 
