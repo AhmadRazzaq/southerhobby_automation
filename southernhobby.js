@@ -5,34 +5,40 @@ const axios = require("axios");
 const app = express();
 app.use(express.json());
 
-const EMAIL = "topstarsalesllc@gmail.com";
-const PASSWORD = "captain52";
-
-app.get("/run-southern", async (req, res) => {
+app.post("/run-southern", async (req, res) => {
     let browser;
+
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+        return res.status(400).json({
+            success: false,
+            error: "Email and password are required"
+        });
+    }
 
     try {
         browser = await chromium.launch({ headless: true });
-        // browser = await chromium.launch({
-        //     headless: false,
-        //     slowMo: 200   // optional: slows actions so you can see them
-        // });
+
         const context = await browser.newContext();
         const page = await context.newPage();
 
         console.log("Opening spreadsheet page...");
-        await page.goto("https://www.southernhobby.com/product_spreadsheet.php", {
-            waitUntil: "domcontentloaded"
-        });
 
-        // Check if login page is shown
+        await page.goto(
+            "https://www.southernhobby.com/product_spreadsheet.php",
+            { waitUntil: "domcontentloaded" }
+        );
+
+        // Check if login page appears
         const emailField = await page.$('input[name="email_address"]');
 
         if (emailField) {
             console.log("Login required. Logging in...");
 
-            await page.fill('input[name="email_address"]', EMAIL);
-            await page.fill('input[name="password"]', PASSWORD);
+            await page.fill('input[name="email_address"]', email);
+            await page.fill('input[name="password"]', password);
 
             await Promise.all([
                 page.waitForNavigation(),
@@ -42,7 +48,7 @@ app.get("/run-southern", async (req, res) => {
             console.log("Logged in successfully.");
         }
 
-        // Now check for download link
+        // Wait briefly for page to load fully
         await page.waitForTimeout(2000);
 
         const linkElement = await page.$("#link");
@@ -59,7 +65,7 @@ app.get("/run-southern", async (req, res) => {
 
         console.log("Found href:", hrefValue);
 
-        // Extract filename from javascript:download('spreadsheet/FILE.xlsx')
+        // Extract file name
         const match = hrefValue.match(/download\('(.+?)'\)/);
 
         if (!match) {
@@ -71,7 +77,7 @@ app.get("/run-southern", async (req, res) => {
 
         console.log("Extracted file name:", fileName);
 
-        // Send to external API
+        // Send filename to external API
         const apiResponse = await axios.post(
             "https://codewithninja.com/southern.php",
             new URLSearchParams({
@@ -83,8 +89,6 @@ app.get("/run-southern", async (req, res) => {
                 }
             }
         );
-
-        console.log("API Response:", apiResponse.data);
 
         res.json({
             success: true,
